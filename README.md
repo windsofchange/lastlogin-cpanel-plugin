@@ -14,7 +14,7 @@ This plugin streamlines the process by allowing both SysAdmins and cPanel users 
 
 To install this free cpanel plugin you need access to the WHM and terminal. Login to SSH and run the following commands to install the plugin:
 
-`wget https://github.com/windsofchange/lastlogin-cpanel-plugin/archive/refs/heads/main.zip`
+`cd /usr/local/src && wget https://github.com/windsofchange/lastlogin-cpanel-plugin/archive/refs/heads/main.zip`
 `unzip main.zip && cd lastlogin-cpanel-plugin-main/`
 `chmod +x install.sh && ./install.sh`
 
