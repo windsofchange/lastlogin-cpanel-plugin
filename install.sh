@@ -19,8 +19,18 @@
 set -euo pipefail
 
 CPANEL_FRONTEND="/usr/local/cpanel/base/frontend"
-INSTALL_BIN="/usr/local/cpanel/bin/install_plugin"
 PLUGIN_TAR="loginlog.tar"
+
+# Locate install_plugin — cPanel places it in scripts/ on most versions
+# but some builds also have a bin/ symlink; check both.
+if   [[ -x "/usr/local/cpanel/scripts/install_plugin" ]]; then
+    INSTALL_BIN="/usr/local/cpanel/scripts/install_plugin"
+elif [[ -x "/usr/local/cpanel/bin/install_plugin" ]]; then
+    INSTALL_BIN="/usr/local/cpanel/bin/install_plugin"
+else
+    echo "Error: install_plugin not found. Is cPanel installed on this server?" >&2
+    exit 1
+fi
 
 # Ensure we're running as root
 if [[ "${EUID}" -ne 0 ]]; then

@@ -43,13 +43,13 @@ To remove the plugin completely from both themes, run the following as root:
 
 ```bash
 # Remove from Jupiter theme
-/usr/local/cpanel/bin/uninstall_plugin \
+/usr/local/cpanel/scripts/uninstall_plugin \
   /usr/local/cpanel/base/frontend/jupiter/loginlog/loginlog.tar \
   --theme jupiter
 rm -rf /usr/local/cpanel/base/frontend/jupiter/loginlog
 
 # Remove from paper_lantern theme
-/usr/local/cpanel/bin/uninstall_plugin \
+/usr/local/cpanel/scripts/uninstall_plugin \
   /usr/local/cpanel/base/frontend/paper_lantern/loginlog/loginlog.tar \
   --theme paper_lantern
 rm -rf /usr/local/cpanel/base/frontend/paper_lantern/loginlog
@@ -58,7 +58,7 @@ rm -rf /usr/local/cpanel/base/frontend/paper_lantern/loginlog
 Then rebuild the cPanel interface cache so the icon disappears immediately:
 
 ```bash
-/usr/local/cpanel/bin/rebuild_sprites
+/usr/local/cpanel/scripts/rebuild_sprites
 ```
 
 ---
