@@ -1,8 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="#FF6C2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Shield outline — matches Jupiter's thin-stroke icon style -->
-  <path d="M24 4 L41 11 V25 C41 36 33 43 24 46 C15 43 7 36 7 25 V11 Z"/>
-  <!-- Person head -->
-  <circle cx="24" cy="20" r="5"/>
-  <!-- Person shoulders arc -->
-  <path d="M14 38 C14 31.5 18.5 27.5 24 27.5 C29.5 27.5 34 31.5 34 38"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="#FF6C2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 4 L41 11 V25 C41 36 33 43 24 46 C15 43 7 36 7 25 V11 Z"/><circle cx="24" cy="20" r="5"/><path d="M14 38 C14 31.5 18.5 27.5 24 27.5 C29.5 27.5 34 31.5 34 38"/></svg>
