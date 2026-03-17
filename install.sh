@@ -13,6 +13,7 @@
 #   - Added: set -euo pipefail for safer scripting.
 #   - Added: existence checks before copying files.
 #   - Added: informational output for each step.
+#   - Added: loginlog.svg (48×48 Jupiter-native SVG icon) copied to both themes.
 # =============================================================================
 
 set -euo pipefail
@@ -29,7 +30,7 @@ fi
 
 # Ensure required files exist in the current directory
 for required in "${PLUGIN_TAR}" "lastlogin.live.php" "src/Account.php" \
-                "src/hostname.php" "assets/css/main.css"; do
+                "src/hostname.php" "assets/css/main.css" "loginlog.svg"; do
     if [[ ! -f "${required}" ]]; then
         echo "Error: Required file not found: ${required}" >&2
         exit 1
@@ -48,6 +49,7 @@ cp "lastlogin.live.php"        "${PL_DIR}/"
 cp "src/Account.php"           "${PL_DIR}/src/"
 cp "src/hostname.php"          "${PL_DIR}/src/"
 cp "assets/css/main.css"       "${PL_DIR}/assets/css/"
+cp "loginlog.svg"              "${PL_DIR}/"
 
 "${INSTALL_BIN}" "${PL_DIR}/${PLUGIN_TAR}" --theme paper_lantern
 echo "  → paper_lantern install complete."
@@ -68,6 +70,7 @@ cp "lastlogin.live.php"        "${JUP_DIR}/"
 cp "src/Account.php"           "${JUP_DIR}/src/"
 cp "src/hostname.php"          "${JUP_DIR}/src/"
 cp "assets/css/main.css"       "${JUP_DIR}/assets/css/"
+cp "loginlog.svg"              "${JUP_DIR}/"
 
 "${INSTALL_BIN}" "${JUP_DIR}/${PLUGIN_TAR}" --theme jupiter
 echo "  → jupiter install complete."
