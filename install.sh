@@ -2,18 +2,11 @@
 # =============================================================================
 # install.sh — cPanel Login Log Plugin Installer
 #
-# Installs the plugin for both the paper_lantern and jupiter cPanel themes.
+# Installs the plugin for whichever cPanel themes are present on this server
+# (jupiter and/or paper_lantern). Themes that are not installed are skipped
+# automatically — no manual configuration required.
 #
 # Usage: sudo ./install.sh
-#
-# Changes from v1.0.3:
-#   - Fixed: mv → cp for jupiter theme (mv was destructively removing source
-#     files after the paper_lantern install, leaving install_plugin with no
-#     loginlog.tar to read for the jupiter step).
-#   - Added: set -euo pipefail for safer scripting.
-#   - Added: existence checks before copying files.
-#   - Added: informational output for each step.
-#   - Added: loginlog.svg (48×48 Jupiter-native SVG icon) copied to both themes.
 # =============================================================================
 
 set -euo pipefail
@@ -21,8 +14,9 @@ set -euo pipefail
 CPANEL_FRONTEND="/usr/local/cpanel/base/frontend"
 PLUGIN_TAR="loginlog.tar"
 
-# Locate install_plugin — cPanel places it in scripts/ on most versions
-# but some builds also have a bin/ symlink; check both.
+# ── Locate install_plugin ──────────────────────────────────────────────────
+# cPanel places it in scripts/ on most versions; some builds also have a
+# bin/ symlink.
 if   [[ -x "/usr/local/cpanel/scripts/install_plugin" ]]; then
     INSTALL_BIN="/usr/local/cpanel/scripts/install_plugin"
 elif [[ -x "/usr/local/cpanel/bin/install_plugin" ]]; then
@@ -32,13 +26,13 @@ else
     exit 1
 fi
 
-# Ensure we're running as root
+# ── Root check ─────────────────────────────────────────────────────────────
 if [[ "${EUID}" -ne 0 ]]; then
     echo "Error: This script must be run as root (sudo)." >&2
     exit 1
 fi
 
-# Ensure required files exist in the current directory
+# ── Pre-flight: required source files ──────────────────────────────────────
 for required in "${PLUGIN_TAR}" "lastlogin.live.php" "src/Account.php" \
                 "src/hostname.php" "assets/css/main.css" "loginlog.svg"; do
     if [[ ! -f "${required}" ]]; then
@@ -47,43 +41,45 @@ for required in "${PLUGIN_TAR}" "lastlogin.live.php" "src/Account.php" \
     fi
 done
 
-# ── paper_lantern theme ────────────────────────────────────────────────────
-echo "Installing for theme: paper_lantern …"
-PL_DIR="${CPANEL_FRONTEND}/paper_lantern/loginlog"
+# ── Helper: install into one theme ─────────────────────────────────────────
+install_theme() {
+    local theme="${1}"
+    local theme_dir="${CPANEL_FRONTEND}/${theme}"
+    local plugin_dir="${theme_dir}/loginlog"
 
-mkdir -p "${PL_DIR}/src"
-mkdir -p "${PL_DIR}/assets/css"
+    # Skip themes that are not installed on this server
+    if [[ ! -d "${theme_dir}" ]]; then
+        echo "  → theme '${theme}' not found on this server, skipping."
+        return 0
+    fi
 
-cp "${PLUGIN_TAR}"             "${PL_DIR}/"
-cp "lastlogin.live.php"        "${PL_DIR}/"
-cp "src/Account.php"           "${PL_DIR}/src/"
-cp "src/hostname.php"          "${PL_DIR}/src/"
-cp "assets/css/main.css"       "${PL_DIR}/assets/css/"
-cp "loginlog.svg"              "${PL_DIR}/"
+    echo "Installing for theme: ${theme} …"
 
-"${INSTALL_BIN}" "${PL_DIR}/${PLUGIN_TAR}" --theme paper_lantern
-echo "  → paper_lantern install complete."
+    mkdir -p "${plugin_dir}/src"
+    mkdir -p "${plugin_dir}/assets/css"
 
-# ── jupiter theme ──────────────────────────────────────────────────────────
-echo "Installing for theme: jupiter …"
-JUP_DIR="${CPANEL_FRONTEND}/jupiter/loginlog"
+    cp "${PLUGIN_TAR}"        "${plugin_dir}/"
+    cp "lastlogin.live.php"   "${plugin_dir}/"
+    cp "src/Account.php"      "${plugin_dir}/src/"
+    cp "src/hostname.php"     "${plugin_dir}/src/"
+    cp "assets/css/main.css"  "${plugin_dir}/assets/css/"
+    cp "loginlog.svg"         "${plugin_dir}/"
 
-mkdir -p "${JUP_DIR}/src"
-mkdir -p "${JUP_DIR}/assets/css"
+    "${INSTALL_BIN}" "${plugin_dir}/${PLUGIN_TAR}" --theme "${theme}"
+    echo "  → ${theme} install complete."
+}
 
-# FIX: use cp (not mv) so source files remain intact after paper_lantern install.
-# The original script used mv here, which (a) destroyed the local source copies
-# and (b) caused install_plugin to fail because loginlog.tar had already been
-# moved away from the working directory.
-cp "${PLUGIN_TAR}"             "${JUP_DIR}/"
-cp "lastlogin.live.php"        "${JUP_DIR}/"
-cp "src/Account.php"           "${JUP_DIR}/src/"
-cp "src/hostname.php"          "${JUP_DIR}/src/"
-cp "assets/css/main.css"       "${JUP_DIR}/assets/css/"
-cp "loginlog.svg"              "${JUP_DIR}/"
+# ── Install for each supported theme ───────────────────────────────────────
+INSTALLED=0
 
-"${INSTALL_BIN}" "${JUP_DIR}/${PLUGIN_TAR}" --theme jupiter
-echo "  → jupiter install complete."
+for theme in jupiter paper_lantern; do
+    install_theme "${theme}" && INSTALLED=$(( INSTALLED + 1 ))
+done
 
 echo ""
-echo "Plugin installed successfully for both themes."
+if [[ "${INSTALLED}" -eq 0 ]]; then
+    echo "Warning: No supported cPanel themes were found. Nothing was installed." >&2
+    exit 1
+fi
+
+echo "Plugin installed successfully."
